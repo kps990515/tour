@@ -16,3 +16,7 @@ server:
   servlet:
     encoding:
       force-response: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  shutdown: graceful
+
