@@ -6,6 +6,7 @@ import com.flab.tour.common.exception.ApiException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -50,13 +51,11 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Api<Object>> handleMethodArgumentNotValideException(MethodArgumentNotValidException e) {
-        Map<String, String> errors = new HashMap<>();
-
-        e.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
+        Map<String, String> errors = e.getBindingResult().getAllErrors().stream()
+                .collect(Collectors.toMap(
+                        error -> ((FieldError) error).getField(),
+                        error -> error.getDefaultMessage() != null ? error.getDefaultMessage() : "Unknown error",
+                        (existing, replacement) -> existing));
 
         ApiException apiException = new ApiException(UserErrorCode.VALIDATION_ERROR, errors.toString());
         return ResponseEntity
