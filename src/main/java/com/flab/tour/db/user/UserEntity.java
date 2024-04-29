@@ -1,14 +1,18 @@
 package com.flab.tour.db.user;
 
+import com.flab.tour.common.util.OrderedUUIDGenerator;
 import com.flab.tour.common.validation.PhoneNumber;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user")
@@ -17,9 +21,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserEntity{
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "user_id", nullable = false, length = 36)
-    private String userId;
+    @JdbcTypeCode(SqlTypes.VARCHAR)
+    private UUID userId;
+
+    @PrePersist // persist 연산을 통해 처음으로 데이터베이스에 저장되기 전에 메소드가 실행
+    private void generateUUID(){
+        this.userId = OrderedUUIDGenerator.generateOrderedUUID();
+    }
 
     @Column(name = "name", nullable = false, length = 256)
     private String name;
