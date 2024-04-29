@@ -19,3 +19,8 @@ server:
   servlet:
     encoding:
       force-response: true
+
+token:
+  secretKey: "SpringBootJWTHelperTokenSecretKeyValue123!@#"
+  accessTokenExpiryHours: 1
+  refreshTokenExpiryHours: 12
