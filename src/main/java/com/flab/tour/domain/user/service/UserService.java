@@ -12,6 +12,8 @@ import com.flab.tour.domain.user.controller.model.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Service
 public class UserService extends BaseService {
@@ -19,10 +21,13 @@ public class UserService extends BaseService {
     private final UserMapper userMapper;
 
     public UserResponse login(UserLoginRequest request) {
-        var userEntity = userRepository.findFirstByEmailAndPasswordOrderByUserIdDesc(request.getEmail(), request.getPassword())
-                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND));
+        var userEntity = userRepository.findFirstByEmailAndPasswordOrderByUserIdDesc(request.getEmail(), request.getPassword());
 
-        return new UserResponse("로그인완료");
+        if(userEntity.isPresent()){
+            return new UserResponse("로그인완료");
+        }else{
+            throw new ApiException(UserErrorCode.USER_NOT_FOUND);
+        }
     }
 
     public UserResponse register(UserRegisterRequest svo) {
@@ -35,5 +40,10 @@ public class UserService extends BaseService {
         userRepository.save(newUser);
 
         return new UserResponse("가입완료");
+    }
+
+    public UUID getUserId(UserLoginRequest request) {
+        return userRepository.findFirstByEmailAndPasswordOrderByUserIdDesc(request.getEmail(), request.getPassword())
+                .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND)).getUserId();
     }
 }
