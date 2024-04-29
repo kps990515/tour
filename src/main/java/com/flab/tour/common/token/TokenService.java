@@ -37,13 +37,13 @@ public class TokenService {
         return baseToken.issueRefreshToken(data);
     }
 
-    public Long validationToken(String token){
+    public UUID validationToken(String token){
         var map = baseToken.validationTokenWithThrow(token);
         var userId = map.get("userId");
 
         Objects.requireNonNull(userId, () -> {throw new ApiException(CommonErrorCode.NULL_POINT, "token에 할당된 사용자 없음");});
 
-        return Long.parseLong(userId.toString());
+        return UUID.fromString(userId.toString());
     }
 
     public TokenResponse toResponse(BaseTokenVO accessToken, BaseTokenVO refreshToken){
