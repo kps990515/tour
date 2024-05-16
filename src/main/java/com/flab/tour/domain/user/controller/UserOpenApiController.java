@@ -25,9 +25,9 @@ public class UserOpenApiController extends BaseController {
         return Api.OK(response);
     }
 
-    @PostMapping("/register")
-    public Api<UserResponse> register(@Valid @RequestBody UserRegisterRequest request){
-        var response = userService.register(request);
+    @PostMapping("/sigin/email")
+    public Api<UserResponse> signinByEmail(@Valid @RequestBody UserRegisterRequest request){
+        var response = userService.signinByEmail(request);
         return Api.OK(response);
     }
 

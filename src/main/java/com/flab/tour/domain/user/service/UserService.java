@@ -7,18 +7,18 @@ import com.flab.tour.config.objectmapper.ObjectConvertUtil;
 import com.flab.tour.db.user.UserEntity;
 import com.flab.tour.db.user.UserMapper;
 import com.flab.tour.db.user.UserRepository;
-import com.flab.tour.domain.user.controller.model.User;
-import com.flab.tour.domain.user.controller.model.UserLoginRequest;
-import com.flab.tour.domain.user.controller.model.UserRegisterRequest;
-import com.flab.tour.domain.user.controller.model.UserResponse;
+import com.flab.tour.db.user.UserUpdateMapper;
+import com.flab.tour.domain.user.controller.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
 public class UserService extends BaseService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final UserUpdateMapper userUpdateMapper;
 
     public UserResponse login(UserLoginRequest request) {
         var userEntity = userRepository.findFirstByEmailAndPasswordOrderByUserIdDesc(request.getEmail(), request.getPassword());
@@ -30,7 +30,7 @@ public class UserService extends BaseService {
         }
     }
 
-    public UserResponse register(UserRegisterRequest svo) {
+    public UserResponse signinByEmail(UserRegisterRequest svo) {
         userRepository.findFirstByEmail(svo.getEmail())
                 .ifPresent(user -> {
                     throw new ApiException(UserErrorCode.EXIST_ID);
@@ -47,7 +47,15 @@ public class UserService extends BaseService {
         return ObjectConvertUtil.getInstance().copyVO(userEntity, User.class);
     }
 
-    public String getUserId(UserLoginRequest request) {
+    @Transactional
+    public UserResponse updateProfile(UUID userId, UserUpdateRequest request) {
+        var userEntity = getUserWithThrow(userId);
+        userUpdateMapper.updateUserFromRequest(request, userEntity);
+        userRepository.save(userEntity);
+        return new UserResponse("프로필 수정완료");
+    }
+
+    public UUID getUserId(UserLoginRequest request) {
         return userRepository.findFirstByEmailAndPasswordOrderByUserIdDesc(request.getEmail(), request.getPassword())
                 .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND)).getUserId();
     }
