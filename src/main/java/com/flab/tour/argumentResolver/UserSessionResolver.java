@@ -1,6 +1,5 @@
 package com.flab.tour.argumentResolver;
 
-import com.flab.tour.common.annotation.UserSession;
 import com.flab.tour.common.error.CommonErrorCode;
 import com.flab.tour.common.exception.ApiException;
 import com.flab.tour.config.objectmapper.ObjectConvertUtil;
@@ -16,8 +15,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import java.util.UUID;
-
 @Component
 @RequiredArgsConstructor
 public class UserSessionResolver implements HandlerMethodArgumentResolver {
@@ -26,10 +23,7 @@ public class UserSessionResolver implements HandlerMethodArgumentResolver {
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        var annotations = parameter.hasParameterAnnotation(UserSession.class);
-        var parameterType = parameter.getParameterType().equals(User.class);
-
-        return (annotations && parameterType);
+        return (parameter.getParameterType().equals(User.class));
     }
 
     @Override
@@ -41,7 +35,7 @@ public class UserSessionResolver implements HandlerMethodArgumentResolver {
             throw new ApiException(CommonErrorCode.NULL_POINT, "userId == null");
         }
 
-        var userEntity = userService.getUserWithThrow(UUID.fromString(userId.toString()));
+        var userEntity = userService.getUserWithThrow(userId.toString());
 
         // 사용자 정보세팅
         return ObjectConvertUtil.getInstance().copyVO(userEntity, User.class);

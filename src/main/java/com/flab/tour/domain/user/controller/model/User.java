@@ -8,13 +8,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    private UUID userId;
+    private String userId;
 
     @NotBlank
     private String name;

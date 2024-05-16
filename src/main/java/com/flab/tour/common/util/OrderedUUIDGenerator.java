@@ -3,7 +3,7 @@ package com.flab.tour.common.util;
 import java.util.UUID;
 
 public class OrderedUUIDGenerator {
-    public static UUID generateOrderedUUID() {
+    public static String generateOrderedUUID() {
         // 기본 UUID 생성
         long currentTime = System.currentTimeMillis();
         long msb = currentTime << 32; // 상위 64비트에 중 앞 32비트에 시간 정보 배치
@@ -13,6 +13,7 @@ public class OrderedUUIDGenerator {
         msb |= (long) (Math.random() * 0xFFFFFFFFL); // 상위 64비트 중 뒤 32비트에 랜덤값
         lsb |= ((long) (Math.random() * 0xFFFFFFFFL)) << 32; // 하위 64비트 중 앞 32비트에 랜덤값
 
-        return new UUID(msb, lsb);
+        UUID uuid = new UUID(msb, lsb);
+        return uuid.toString();
     }
 }

@@ -7,12 +7,9 @@ import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "user")
@@ -22,10 +19,10 @@ import java.util.UUID;
 public class UserEntity{
     @Id
     @Column(name = "user_id", nullable = false, length = 36)
-    @JdbcTypeCode(SqlTypes.VARCHAR)
-    private UUID userId;
+    private String userId;
 
     @PrePersist // persist 연산을 통해 처음으로 데이터베이스에 저장되기 전에 메소드가 실행
+    // DB에 처음 저장될때만 실행(Update할때마다 바꾸고 싶으면 @PreUpdate사용)
     private void generateUUID(){
         this.userId = OrderedUUIDGenerator.generateOrderedUUID();
     }
