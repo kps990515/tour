@@ -14,12 +14,12 @@ public class Api<T> {
     private Result result;
 
     @Valid
-    private T body;
+    private T response;
 
-    public static <T> Api<T> OK(T body){
+    public static <T> Api<T> OK(T response){
         var api = new Api<T>();
         api.result = Result.OK();
-        api.body = body;
+        api.response = response;
         return api;
     }
 
