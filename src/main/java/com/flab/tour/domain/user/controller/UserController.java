@@ -1,6 +1,5 @@
 package com.flab.tour.domain.user.controller;
 
-import com.flab.tour.common.annotation.UserSession;
 import com.flab.tour.common.api.Api;
 import com.flab.tour.common.token.TokenResponse;
 import com.flab.tour.common.token.TokenService;
@@ -13,18 +12,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/v1/users/")
-public class UserApiController {
+public class UserController {
     private final UserService userService;
     private final TokenService tokenService;
 
     @GetMapping("/me")
-    public Api<User> me(@UserSession User user){
+    public Api<User> me(User user){
         var response = userService.me(user.getUserId());
         return Api.OK(response);
     }
 
     @PutMapping("/me")
-    public Api<UserResponse> me(@UserSession User user, @RequestBody UserUpdateRequest request){
+    public Api<UserResponse> me(User user, @RequestBody UserUpdateRequest request){
         var response = userService.updateProfile(user.getUserId(), request);
         return Api.OK(response);
     }
