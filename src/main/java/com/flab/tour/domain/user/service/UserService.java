@@ -14,8 +14,6 @@ import com.flab.tour.domain.user.controller.model.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 @Service
 public class UserService extends BaseService {
@@ -44,17 +42,17 @@ public class UserService extends BaseService {
         return new UserResponse("가입완료");
     }
 
-    public User me(UUID userId) {
+    public User me(String userId) {
         var userEntity = getUserWithThrow(userId);
         return ObjectConvertUtil.getInstance().copyVO(userEntity, User.class);
     }
 
-    public UUID getUserId(UserLoginRequest request) {
+    public String getUserId(UserLoginRequest request) {
         return userRepository.findFirstByEmailAndPasswordOrderByUserIdDesc(request.getEmail(), request.getPassword())
                 .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND)).getUserId();
     }
 
-    public UserEntity getUserWithThrow(UUID userId){
+    public UserEntity getUserWithThrow(String userId){
         return userRepository.findFirstByUserId(userId)
                 .orElseThrow(() -> new ApiException(UserErrorCode.USER_NOT_FOUND));
     }

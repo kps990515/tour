@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Objects;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -19,31 +18,31 @@ public class TokenService {
     private final UserService userService;
 
     public TokenResponse issueToken(UserLoginRequest request){
-        UUID userId = userService.getUserId(request);
+        String userId = userService.getUserId(request);
         var accessToken = issuesAccessToken(userId);
         var refreshToekn = issuesRefreshToken(userId);
         return toResponse(accessToken, refreshToekn);
     }
 
-    public BaseTokenVO issuesAccessToken(UUID userId){
+    public BaseTokenVO issuesAccessToken(String userId){
         var data = new HashMap<String, Object>();
         data.put("userId", userId);
         return baseToken.issueAccessToken(data);
     }
 
-    public BaseTokenVO issuesRefreshToken(UUID userId){
+    public BaseTokenVO issuesRefreshToken(String userId){
         var data = new HashMap<String, Object>();
         data.put("userId", userId);
         return baseToken.issueRefreshToken(data);
     }
 
-    public UUID validationToken(String token){
+    public String validationToken(String token){
         var map = baseToken.validationTokenWithThrow(token);
         var userId = map.get("userId");
 
         Objects.requireNonNull(userId, () -> {throw new ApiException(CommonErrorCode.NULL_POINT, "token에 할당된 사용자 없음");});
 
-        return UUID.fromString(userId.toString());
+        return userId.toString();
     }
 
     public TokenResponse toResponse(BaseTokenVO accessToken, BaseTokenVO refreshToken){
