@@ -11,8 +11,16 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: root1234!!
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
 
 server:
+  shutdown: graceful
   servlet:
     encoding:
       force-response: true
+
+token:
+  secretKey: "SpringBootJWTHelperTokenSecretKeyValue123!@#"
+  accessTokenExpiryHours: 1
+  refreshTokenExpiryHours: 12
