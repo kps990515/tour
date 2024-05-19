@@ -1,8 +1,8 @@
 package com.flab.tour.db.user;
 
-import com.flab.tour.common.util.OrderedUUIDGenerator;
 import com.flab.tour.common.validation.PhoneNumber;
 import com.flab.tour.db.BaseEntity;
+import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -27,7 +27,7 @@ public class UserEntity extends BaseEntity {
     @PrePersist // persist 연산을 통해 처음으로 데이터베이스에 저장되기 전에 메소드가 실행
     // DB에 처음 저장될때만 실행(Update할때마다 바꾸고 싶으면 @PreUpdate사용)
     private void generateUUID(){
-        this.userId = OrderedUUIDGenerator.generateOrderedUUID();
+        this.userId = UuidCreator.getTimeOrderedEpoch().toString();
     }
 
     @Column(name = "name", nullable = false, length = 256)
