@@ -1,5 +1,6 @@
 package com.flab.tour.domain.user.controller.model;
 
+import com.flab.tour.common.validation.PhoneNumber;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,7 @@ public class UserRegisterRequest {
     private String password;
 
     @NotBlank
+    @PhoneNumber
     private String phoneNumber;
 
     private boolean emailMarketingConsent;
