@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import org.springframework.data.domain.Persistable;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity extends BaseEntity {
+public class UserEntity extends BaseEntity implements Persistable<String>{
     @Id
     @Column(name = "user_id", nullable = false, length = 36)
     private String userId;
@@ -27,7 +28,9 @@ public class UserEntity extends BaseEntity {
     @PrePersist // persist 연산을 통해 처음으로 데이터베이스에 저장되기 전에 메소드가 실행
     // DB에 처음 저장될때만 실행(Update할때마다 바꾸고 싶으면 @PreUpdate사용)
     private void generateUUID(){
-        this.userId = UuidCreator.getTimeOrderedEpoch().toString();
+        if (this.userId == null) {
+            this.userId = UuidCreator.getTimeOrderedEpoch().toString();
+        }
     }
 
     @Column(name = "name", nullable = false, length = 256)
@@ -64,4 +67,24 @@ public class UserEntity extends BaseEntity {
 
     @Column(name = "push_marketing_consent_last_modifed_at")
     private LocalDateTime pushMarketingConsentLastModifiedAt;
+
+    @Transient
+    private boolean isNew = true;
+
+    @PostLoad
+    @PostPersist
+    @PostUpdate
+    private void markNotNew() {
+        this.isNew = false;
+    }
+
+    @Override
+    public String getId() {
+        return this.userId;
+    }
+
+    @Override
+    public boolean isNew() {
+        return false;
+    }
 }
