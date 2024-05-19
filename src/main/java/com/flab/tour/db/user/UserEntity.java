@@ -2,21 +2,24 @@ package com.flab.tour.db.user;
 
 import com.flab.tour.common.util.OrderedUUIDGenerator;
 import com.flab.tour.common.validation.PhoneNumber;
+import com.flab.tour.db.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "user")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity{
+public class UserEntity extends BaseEntity {
     @Id
     @Column(name = "user_id", nullable = false, length = 36)
     private String userId;
@@ -61,10 +64,4 @@ public class UserEntity{
 
     @Column(name = "push_marketing_consent_last_modifed_at")
     private LocalDateTime pushMarketingConsentLastModifiedAt;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "modified_at", nullable = false)
-    private LocalDateTime modifiedAt;
 }

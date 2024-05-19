@@ -17,7 +17,9 @@ public class WebConfig implements WebMvcConfigurer {
     private final UserSessionResolver userSessionResolver;
 
     private final List<String> OPEN_API = List.of(
-            "/open-api/**"
+            "/v1/users/signup",
+            "/v1/users/login",
+            "/v1/users/get-token"
     );
 
     private final List<String> DEFAULT_EXCLUDE = List.of(
