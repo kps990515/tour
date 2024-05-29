@@ -40,7 +40,7 @@ public class UserController {
         return Api.OK(response);
     }
 
-    @PostMapping("/get-token")
+    @PostMapping("/token")
     public Api<TokenResponse> getToken(UserLoginRequest request){
         var response = tokenService.issueToken(request);
         return Api.OK(response);
