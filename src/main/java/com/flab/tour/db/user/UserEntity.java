@@ -28,9 +28,7 @@ public class UserEntity extends BaseEntity implements Persistable<String>{
     @PrePersist // persist 연산을 통해 처음으로 데이터베이스에 저장되기 전에 메소드가 실행
     // DB에 처음 저장될때만 실행(Update할때마다 바꾸고 싶으면 @PreUpdate사용)
     private void generateUUID(){
-        if (this.userId == null) {
-            this.userId = UuidCreator.getTimeOrderedEpoch().toString();
-        }
+        this.userId = UuidCreator.getTimeOrderedEpoch().toString();
     }
 
     @Column(name = "name", nullable = false, length = 256)
@@ -85,6 +83,6 @@ public class UserEntity extends BaseEntity implements Persistable<String>{
 
     @Override
     public boolean isNew() {
-        return false;
+        return isNew;
     }
 }
