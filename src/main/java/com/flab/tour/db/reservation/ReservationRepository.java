@@ -1,7 +1,11 @@
 package com.flab.tour.db.reservation;
 
+import com.flab.tour.db.product.ProductAvailabilityEntity;
 import com.flab.tour.domain.reservation.controller.model.ReservationSearchResponse;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -20,4 +24,26 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
                                                         @Param("startDate") LocalDate startDate,
                                                         @Param("endDate") LocalDate endDate,
                                                         @Param("status") String status);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM ProductAvailability p WHERE p.productId = :productId")
+    ProductAvailabilityEntity lockProduct(@Param("productId") String productId);
+
+    @Modifying
+    @Query("UPDATE ProductAvailability p " +
+           "SET p.quantityAvailable = p.quantityAvailable - :quantity, " +
+               "p.modifiedAt = CURRENT_TIMESTAMP " +
+           "WHERE p.productId = :productId " +
+           "AND p.quantityAvailable >= :quantity")
+    int pessimisticReservate(@Param("productId") String productId, @Param("quantity") int quantity);
+
+    @Modifying
+    @Query("UPDATE ProductAvailability p " +
+            "SET p.quantityAvailable = p.quantityAvailable - :quantity, " +
+            "p.modifiedAt = CURRENT_TIMESTAMP " +
+            "WHERE p.productId = :productId " +
+            "AND p.quantityAvailable >= :quantity" +
+            "AND p.version = :version")
+    int optimistcReservate(@Param("productId") String productId, @Param("quantity") int quantity, @Param("version") int version);
 }
+
