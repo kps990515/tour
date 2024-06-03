@@ -13,6 +13,9 @@ spring:
     password: root1234!!
   lifecycle:
     timeout-per-shutdown-phase: 30s
+  redis:
+    host: localhost
+    port: 6379
 
 server:
   shutdown: graceful
@@ -24,3 +27,4 @@ token:
   secretKey: "SpringBootJWTHelperTokenSecretKeyValue123!@#"
   accessTokenExpiryHours: 1
   refreshTokenExpiryHours: 12
+
