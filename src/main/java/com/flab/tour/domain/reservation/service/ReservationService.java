@@ -28,6 +28,7 @@ public class ReservationService extends BaseService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
 
+
     public List<ReservationSearchResponse> searchAllReservations(User user, ReservationSearchRequest request) {
         var startDate = convertDate(request.getStartDate());
         var endDate = convertDate(request.getEndDate());
