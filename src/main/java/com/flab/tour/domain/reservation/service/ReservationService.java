@@ -11,6 +11,7 @@ import com.flab.tour.domain.reservation.controller.model.ReservationSearchReques
 import com.flab.tour.domain.reservation.controller.model.ReservationSearchResponse;
 import com.flab.tour.domain.user.controller.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -29,24 +30,12 @@ public class ReservationService extends BaseService {
     private final ObjectMapper objectMapper;
 
 
+    @Cacheable(value = "reservations", key = "#user.userId")
     public List<ReservationSearchResponse> searchAllReservations(User user, ReservationSearchRequest request) {
         var startDate = convertDate(request.getStartDate());
         var endDate = convertDate(request.getEndDate());
-        String cacheKey = "reservations:" + user.getUserId();
 
-        // 1. redis 조회
-        Object cachedResult = redisTemplate.opsForValue().get(cacheKey);
-        if (cachedResult != null) {
-            return objectMapper.convertValue(cachedResult, new TypeReference<>() {});
-        }
-
-        // 2. redis에 없으면 DB에서 조회
-        List<ReservationSearchResponse> reservationList = reservationRepository.findAllReservations(user.getUserId(), startDate, endDate, request.getStatus());
-
-        // 3. redis에 저장
-        redisTemplate.opsForValue().set(cacheKey, reservationList, Duration.ofMinutes(10));
-
-        return reservationList;
+        return reservationRepository.findAllReservations(user.getUserId(), startDate, endDate, request.getStatus());
     }
 
     @Transactional
