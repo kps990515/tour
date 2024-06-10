@@ -1,6 +1,9 @@
 package com.flab.tour.db.reservation;
 
 import javax.annotation.processing.Generated;
+
+import com.flab.tour.domain.reservation.controller.model.ReservationRequest;
+import com.flab.tour.domain.user.controller.model.User;
 import org.springframework.stereotype.Component;
 
 @Generated(
@@ -10,4 +13,8 @@ import org.springframework.stereotype.Component;
 )
 @Component
 public class ReservationMapperImpl implements ReservationMapper {
+    @Override
+    public ReservationEntity toNewReservation(User user, ReservationRequest request) {
+        return null;
+    }
 }
