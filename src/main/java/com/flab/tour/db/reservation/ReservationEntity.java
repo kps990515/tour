@@ -29,11 +29,11 @@ public class ReservationEntity extends BaseEntity implements Persistable<String>
         this.reservationId = UuidCreator.getTimeOrderedEpoch().toString();
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private ProductAvailabilityEntity product;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 

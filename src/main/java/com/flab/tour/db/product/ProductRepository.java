@@ -17,8 +17,7 @@ public interface ProductRepository extends JpaRepository<ProductAvailabilityEnti
 
     @Modifying
     @Query("UPDATE ProductAvailabilityEntity p " +
-            "SET p.quantityAvailable = p.quantityAvailable - :quantity, " +
-            "p.modifiedAt = CURRENT_TIMESTAMP " +
+            "SET p.modifiedAt = CURRENT_TIMESTAMP " +
             "WHERE p.productId = :productId " +
             "AND P.date = :reservationDate " +
             "AND p.quantityAvailable >= :quantity") //query method로 변경(이미 락이 있어서 atomic 필요없음)
@@ -27,8 +26,7 @@ public interface ProductRepository extends JpaRepository<ProductAvailabilityEnti
 
     @Modifying
     @Query("UPDATE ProductAvailabilityEntity p " +
-            "SET p.quantityAvailable = p.quantityAvailable - :quantity, " +
-            "p.modifiedAt = CURRENT_TIMESTAMP " +
+            "SET p.modifiedAt = CURRENT_TIMESTAMP " +
             "WHERE p.productId = :productId " +
             "AND P.date = :reservationDate " +
             "AND p.quantityAvailable >= :quantity " +
