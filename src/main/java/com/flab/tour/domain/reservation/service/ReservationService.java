@@ -10,6 +10,7 @@ import com.flab.tour.domain.reservation.controller.model.ReservationRequest;
 import com.flab.tour.domain.reservation.controller.model.ReservationSearchRequest;
 import com.flab.tour.domain.reservation.controller.model.ReservationSearchResponse;
 import com.flab.tour.domain.user.controller.model.User;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -31,10 +32,18 @@ public class ReservationService extends BaseService {
 
 
     @Cacheable(value = "reservations", key = "#user.userId")
+    @CircuitBreaker(name = "reservationService", fallbackMethod = "fallbackSearchAllReservations")
     public List<ReservationSearchResponse> searchAllReservations(User user, ReservationSearchRequest request) {
         var startDate = convertDate(request.getStartDate());
         var endDate = convertDate(request.getEndDate());
 
+        return reservationRepository.findAllReservations(user.getUserId(), startDate, endDate, request.getStatus());
+    }
+
+    public List<ReservationSearchResponse> fallbackSearchAllReservations(User user, ReservationSearchRequest request) {
+        // Redis 장애 발생 시 데이터베이스에서 직접 데이터를 조회
+        var startDate = convertDate(request.getStartDate());
+        var endDate = convertDate(request.getEndDate());
         return reservationRepository.findAllReservations(user.getUserId(), startDate, endDate, request.getStatus());
     }
 
