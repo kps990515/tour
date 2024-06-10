@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flab.tour.config.objectmapper.BaseService;
 import com.flab.tour.db.product.ProductAvailabilityEntity;
 import com.flab.tour.db.product.ProductRepository;
+import com.flab.tour.db.reservation.ReservationEntity;
+import com.flab.tour.db.reservation.ReservationMapper;
 import com.flab.tour.db.reservation.ReservationRepository;
 import com.flab.tour.domain.reservation.controller.model.ReservationRequest;
 import com.flab.tour.domain.reservation.controller.model.ReservationSearchRequest;
@@ -28,6 +30,7 @@ public class ReservationService extends BaseService {
     private final ReservationRepository reservationRepository;
     private final ProductRepository productRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ReservationMapper reservationMapper;
     private final ObjectMapper objectMapper;
 
 
@@ -50,11 +53,16 @@ public class ReservationService extends BaseService {
     @Transactional
     public boolean pessimisticReservate(User user, ReservationRequest request) {
         // Pessimistic Lock 설정
-        ProductAvailabilityEntity productAvailabilityEntity = reservationRepository.lockProduct(request.getProductId());
+        ProductAvailabilityEntity productAvailabilityEntity = productRepository.lockProduct(request.getProductId());
 
         var reservationDate = convertDate(request.getReservationDate());
-        int reservationNumber = reservationRepository.pessimisticReservate(request.getProductId(), reservationDate, request.getQuantity());
+        int reservationNumber = productRepository.pessimisticReservate(request.getProductId(), reservationDate, request.getQuantity());
         if (reservationNumber > 0) {
+            // 1. 예약테이블에 데이터 Insert
+            ReservationEntity reservationEntity = reservationMapper.toNewReservation(user, request);
+            reservationRepository.save(reservationEntity);
+
+            // 2. Redis에 데이터 Update
             updateReservationCache(user, request, reservationDate);
             return true;
         }
@@ -72,9 +80,15 @@ public class ReservationService extends BaseService {
                 ProductAvailabilityEntity productAvailability = productRepository.findById(request.getProductId()).orElseThrow();
                 int version = productAvailability.getVersion();
 
-                int reservationNumber = reservationRepository.optimistcReservate(request.getProductId(), reservationDate, request.getQuantity(), version);
+                int reservationNumber = productRepository.optimistcReservate(request.getProductId(), reservationDate, request.getQuantity(), version);
                 if (reservationNumber > 0) {
                     success = true;
+
+                    // 1. 예약테이블에 데이터 Insert
+                    ReservationEntity reservationEntity = reservationMapper.toNewReservation(user, request);
+                    reservationRepository.save(reservationEntity);
+
+                    // 2. Redis에 데이터 Update
                     updateReservationCache(user, request, reservationDate);
                     return success;
                 }
