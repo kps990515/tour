@@ -8,6 +8,7 @@ import com.flab.tour.domain.reservation.controller.model.ReservationSearchReques
 import com.flab.tour.domain.reservation.controller.model.ReservationSearchResponse;
 import com.flab.tour.domain.reservation.service.ReservationService;
 import com.flab.tour.domain.user.controller.model.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,15 +20,15 @@ import java.util.List;
 public class ReservationController {
     private final ReservationService reservationService;
 
-    @GetMapping("/all")
-    public Api<List<ReservationSearchResponse>> searchAllReservation(User user, @RequestBody ReservationSearchRequest request){
+    @GetMapping("")
+    public Api<List<ReservationSearchResponse>> searchAllReservation(User user, @Valid @RequestBody ReservationSearchRequest request){
         request.validateDates();
         var response = reservationService.searchAllReservations(user, request);
         return Api.OK(response);
     }
 
     @PostMapping("/pessimisticReservation")
-    public Api<String> pessimisticReservate(User user, @RequestBody ReservationRequest request){
+    public Api<String> pessimisticReservate(User user, @Valid @RequestBody ReservationRequest request){
         boolean success = reservationService.pessimisticReservate(user, request);
         if(!success){
             throw new ApiException(ReservationErrorCode.OUT_OF_QUANTITY);
@@ -37,7 +38,7 @@ public class ReservationController {
     }
 
     @PostMapping("/optimisticReservation")
-    public Api<String> optimisticReservate(User user, @RequestBody ReservationRequest request){
+    public Api<String> optimisticReservate(User user, @Valid @RequestBody ReservationRequest request){
         boolean success = reservationService.optimisticReservate(user, request);
         if(!success){
             throw new ApiException(ReservationErrorCode.OUT_OF_QUANTITY);

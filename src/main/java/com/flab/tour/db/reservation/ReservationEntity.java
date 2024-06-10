@@ -1,6 +1,8 @@
 package com.flab.tour.db.reservation;
 
 import com.flab.tour.db.BaseEntity;
+import com.flab.tour.db.product.ProductAvailabilityEntity;
+import com.flab.tour.db.user.UserEntity;
 import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,6 +28,14 @@ public class ReservationEntity extends BaseEntity implements Persistable<String>
     private void generateUUID(){
         this.reservationId = UuidCreator.getTimeOrderedEpoch().toString();
     }
+
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    private ProductAvailabilityEntity product;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private UserEntity user;
 
     @Column(name = "product_id", nullable = false)
     private String productId;
@@ -66,14 +76,10 @@ public class ReservationEntity extends BaseEntity implements Persistable<String>
     @Column(name = "status", nullable = false)
     private String status;
 
+    @Override
     @Transient
-    private boolean isNew = true;
-
-    @PostLoad
-    @PostPersist
-    @PostUpdate
-    private void markNotNew() {
-        this.isNew = false;
+    public boolean isNew() {
+        return getCreatedAt() == null || getCreatedAt().equals(getModifiedAt());
     }
 
     @Override
@@ -81,8 +87,4 @@ public class ReservationEntity extends BaseEntity implements Persistable<String>
         return this.reservationId;
     }
 
-    @Override
-    public boolean isNew() {
-        return isNew;
-    }
 }
