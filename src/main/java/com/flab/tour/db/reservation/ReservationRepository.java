@@ -16,8 +16,8 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<ReservationEntity, String> {
 
-    @Query("SELECT new com.example.ReservationSearchResponse(r.reservationId, r.quantity, r.finalPrice, r.status, " +
-            "p.productId, p.name, p.category, p.city, p.imageUrl) " +
+    @Query("SELECT r.reservationId, r.quantity, r.finalPrice, r.status, " +
+            "p.productId, p.name, p.category, p.city, p.imageUrl " +
             "FROM ReservationEntity r " +
             "JOIN FETCH r.product p " +
             "JOIN FETCH r.user u " +
