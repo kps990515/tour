@@ -39,6 +39,7 @@ dependencies {
 	implementation 'com.github.f4b6a3:uuid-creator:5.3.3'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+	implementation 'io.github.resilience4j:resilience4j-spring-boot2:1.7.1'
 
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
