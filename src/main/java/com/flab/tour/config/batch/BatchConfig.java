@@ -3,6 +3,7 @@ package com.flab.tour.config.batch;
 import com.flab.tour.db.product.ProductAvailabilityEntity;
 import com.flab.tour.db.reservation.ReservationEntity;
 import jakarta.persistence.EntityManagerFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
@@ -18,7 +19,6 @@ import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.batch.item.support.CompositeItemWriter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -30,16 +30,12 @@ import java.util.List;
 
 @Configuration
 @EnableBatchProcessing
+@RequiredArgsConstructor
 public class BatchConfig {
 
-    @Autowired
-    private DataSource dataSource;
-
-    @Autowired
-    private PlatformTransactionManager transactionManager;
-
-    @Autowired
-    private EntityManagerFactory entityManagerFactory;
+    private final DataSource dataSource;
+    private final PlatformTransactionManager transactionManager;
+    private final EntityManagerFactory entityManagerFactory;
 
     @Bean
     // 배치작업의 메타데이터 관리 저장소
