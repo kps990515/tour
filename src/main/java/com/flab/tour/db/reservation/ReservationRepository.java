@@ -16,13 +16,16 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<ReservationEntity, String> {
 
-    @Query(value = "SELECT A.reservation_id AS reservationId, A.quantity, A.final_price AS finalPrice, A.status, " +
-            "B.product_id AS productId, B.name AS productName, B.category, B.city, B.image_url AS imageUrl " +
-            "FROM reservation A " +
-            "LEFT JOIN products B ON A.product_id = B.product_id " +
-            "WHERE A.user_id = :userId " +
-            "AND A.reservation_date BETWEEN :startDate AND :endDate " +
-            "AND A.status = :status", nativeQuery = true)
+    @Query("SELECT new com.example.ReservationSearchResponse(r.reservationId, r.quantity, r.finalPrice, r.status, " +
+            "p.productId, p.name, p.category, p.city, p.imageUrl) " +
+            "FROM ReservationEntity r " +
+            "JOIN FETCH r.product p " +
+            "JOIN FETCH r.user u " +
+            "WHERE u.userId = :userId " +
+            "AND r.reservationDate BETWEEN :startDate AND :endDate " +
+            "AND r.status = :status")
+    // native쿼리는 컴파일시점에 에러체크불가능
+    // fetch join : 성능 최적화와 N+1 문제를 해결
     List<ReservationSearchResponse> findAllReservations(@Param("userId") String userId,
                                                         @Param("startDate") LocalDate startDate,
                                                         @Param("endDate") LocalDate endDate,
@@ -38,7 +41,8 @@ public interface ReservationRepository extends JpaRepository<ReservationEntity, 
             "p.modifiedAt = CURRENT_TIMESTAMP " +
             "WHERE p.productId = :productId " +
             "AND P.date = :reservationDate " +
-            "AND p.quantityAvailable >= :quantity")
+            "AND p.quantityAvailable >= :quantity") //query method로 변경(이미 락이 있어서 atomic 필요없음)
+    // atomic쿼리의 경우는 lock이 없을떄 활용하면 좋음
     int pessimisticReservate(@Param("productId") String productId, @Param("reservationDate") LocalDate reservationDate, @Param("quantity") int quantity);
 
     @Modifying

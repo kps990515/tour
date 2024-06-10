@@ -1,6 +1,7 @@
 package com.flab.tour.db.product;
 
 import com.flab.tour.db.BaseEntity;
+import com.flab.tour.db.reservation.ReservationEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +10,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Entity
@@ -35,14 +38,13 @@ public class ProductAvailabilityEntity extends BaseEntity implements Persistable
     @Column(name = "version", nullable = false)
     private int version;
 
-    @Transient
-    private boolean isNew = true;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservationEntity> reservations = new ArrayList<>();
 
-    @PostLoad
-    @PostPersist
-    @PostUpdate
-    private void markNotNew() {
-        this.isNew = false;
+    @Override
+    @Transient
+    public boolean isNew() {
+        return getCreatedAt() == null || getCreatedAt().equals(getModifiedAt());
     }
 
     @Override
@@ -50,8 +52,4 @@ public class ProductAvailabilityEntity extends BaseEntity implements Persistable
         return this.productId;
     }
 
-    @Override
-    public boolean isNew() {
-        return isNew;
-    }
 }

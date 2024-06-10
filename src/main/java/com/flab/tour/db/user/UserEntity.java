@@ -2,6 +2,7 @@ package com.flab.tour.db.user;
 
 import com.flab.tour.common.validation.PhoneNumber;
 import com.flab.tour.db.BaseEntity;
+import com.flab.tour.db.reservation.ReservationEntity;
 import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -12,6 +13,9 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.data.domain.Persistable;
 
 @EqualsAndHashCode(callSuper = true)
@@ -66,14 +70,13 @@ public class UserEntity extends BaseEntity implements Persistable<String>{
     @Column(name = "push_marketing_consent_last_modifed_at")
     private LocalDateTime pushMarketingConsentLastModifiedAt;
 
-    @Transient
-    private boolean isNew = true;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReservationEntity> reservations = new ArrayList<>();
 
-    @PostLoad
-    @PostPersist
-    @PostUpdate
-    private void markNotNew() {
-        this.isNew = false;
+    @Override
+    @Transient
+    public boolean isNew() {
+        return getCreatedAt() == null || getCreatedAt().equals(getModifiedAt());
     }
 
     @Override
@@ -81,8 +84,4 @@ public class UserEntity extends BaseEntity implements Persistable<String>{
         return this.userId;
     }
 
-    @Override
-    public boolean isNew() {
-        return isNew;
-    }
 }
