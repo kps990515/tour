@@ -36,6 +36,7 @@ public class ReservationService extends BaseService {
 
     @Cacheable(value = "reservations", key = "#user.userId")
     @CircuitBreaker(name = "reservationService", fallbackMethod = "fallbackSearchAllReservations")
+    @Transactional(readOnly = true, transactionManager = "secondaryTransactionManager")
     public List<ReservationSearchResponse> searchAllReservations(User user, ReservationSearchRequest request) {
         var startDate = convertDate(request.getStartDate());
         var endDate = convertDate(request.getEndDate());
@@ -43,6 +44,7 @@ public class ReservationService extends BaseService {
         return reservationRepository.findAllReservations(user.getUserId(), startDate, endDate, request.getStatus());
     }
 
+    @Transactional(readOnly = true, transactionManager = "secondaryTransactionManager")
     public List<ReservationSearchResponse> fallbackSearchAllReservations(User user, ReservationSearchRequest request) {
         // Redis 장애 발생 시 데이터베이스에서 직접 데이터를 조회
         var startDate = convertDate(request.getStartDate());
@@ -50,7 +52,7 @@ public class ReservationService extends BaseService {
         return reservationRepository.findAllReservations(user.getUserId(), startDate, endDate, request.getStatus());
     }
 
-    @Transactional
+    @Transactional(transactionManager = "primaryTransactionManager")
     public boolean pessimisticReservate(User user, ReservationRequest request) {
         // Pessimistic Lock 설정
         ProductAvailabilityEntity productAvailabilityEntity = productRepository.lockProduct(request.getProductId());
@@ -69,7 +71,7 @@ public class ReservationService extends BaseService {
         return false;
     }
 
-    @Transactional
+    @Transactional(transactionManager = "primaryTransactionManager")
     public boolean optimisticReservate(User user, ReservationRequest request) {
         boolean success = false;
         int retryCount = 3;
